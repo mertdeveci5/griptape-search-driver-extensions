@@ -1,7 +1,12 @@
+import os
 from griptape.structures import Agent
-from griptape.extension_name.tools.reverse_string import ReverseStringTool
+from griptape.serper.drivers.serper_web_search import SerperWebSearchDriver
+from griptape.tools import WebSearchTool
 
 
-agent = Agent(tools=[ReverseStringTool()])
+web_search_tool = WebSearchTool(
+    web_search_driver=SerperWebSearchDriver(api_key=os.getenv("SERPER_API_KEY"))
+)
+agent = Agent(tools=[web_search_tool])
 
-agent.run("Use the ReverseStringTool to reverse 'Griptape'")
+agent.run("Find out recent news on Griptape.ai")
