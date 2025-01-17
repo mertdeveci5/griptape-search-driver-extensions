@@ -2,10 +2,10 @@
 name = "griptape_search_driver_extensions"
 version = "0.1.0"
 description = "A Griptape plugin for Serper and Jina search and scraper drivers."
-authors = ["Mert Deveci <mert@troylabs.io"]
+authors = ["Mert Deveci <mert@troylabs.io>"]
 readme = "README.md"
 packages = [
-    {include = "griptape"}
+    {include = "griptape/serper"},
 ]
 
 [tool.poetry.dependencies]

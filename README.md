@@ -1,100 +1,48 @@
-# Griptape Extension Template
+# Griptape Serper Search Extension
 
-A Github template repository for creating Griptape extensions.
+A driver extension for [Serper.dev] (https://serper.dev/) for web searching functionality. This extension also provides functionality to search for only `news`, `places`, `images` and `patents`. You can also use a `date_range` parameter to restrict the search results.
 
 ## Getting Started
 
-Via github web page:
+Get an API key at [Serper.dev] (https://serper.dev/)
 
-Click on `Use this template`
+1. Import `WebSearchTool` and specify the `SerperWebSearchDriver` as the driver.
 
-![](https://docs.github.com/assets/cb-36544/images/help/repository/use-this-template-button.png)
+```python
+web_search_tool = WebSearchTool(
+    web_search_driver=SerperWebSearchDriver(api_key=os.getenv("SERPER_API_KEY"))
+)
+agent = Agent(tools=[web_search_tool])
 
-
-Via `gh`:
-
-```
-$ gh repo create griptape-extension-name -p griptape/griptape-extension-template
-```
-
-## What is a Griptape Extension?
-
-Griptape Extensions can add new functionality to the [Griptape framework](https://github.com/griptape-ai/griptape), such as new Tools, Drivers, Tasks, or Structures.
-With extensions, you can integrate custom APIs, tools, and services into the Griptape ecosystem.
-
-This repository provides a recommended structure for organizing your extension code, as well as helpful tools for testing and development.
-
-## Extension Structure
-
-The template repository is structured as follows:
-
-```bash
-tree -I __init__.py -I __pycache__
-
-├── griptape
-│   └── extension_name # Name whatever you want
-│       └── tools
-│           └── reverse_string
-│               └── tool.py
-            ...more directories for other interfaces (drivers, tasks, structures, etc)...
-└── tests
-    └── unit
-        └── tools
-            └── test_reverse_string_tool.py
-├── examples
-    └── tools
-        └── example_agent.py # Example usage of the extension 
-├── LICENSE # Choose the appropriate license
-├── Makefile # Contains useful commands for development
-├── pyproject.toml # Contains the project's metadata
-├── README.md #  Describes the extension and how to use it
+agent.run("Find out recent news on Griptape.ai")
 ```
 
-## Development
+2. You can use `date_range` parameter and `type` parameter to focus the search results
 
-### Poetry
+```python
+web_search_tool = WebSearchTool(
+    web_search_driver=SerperWebSearchDriver(
+        api_key=os.getenv("SERPER_API_KEY"), type="news", date_range="d"
+    )
+)
+agent = Agent(tools=[web_search_tool])
 
-This project uses [Poetry](https://python-poetry.org/) for dependency management.
-It is recommended to configure Poetry to use [in-project](https://python-poetry.org/docs/configuration/#virtualenvsin-project) virtual environments:
-
-```bash
-poetry config virtualenvs.in-project true
+agent.run("Recent news on Trump please")
 ```
 
-This will create a `.venv` directory in the project root, where the virtual environment will be stored.
-This ensures that the virtual environment is always in the same location, regardless of where the project is cloned.
+Available date ranges:
 
-### Useful Commands
-
-#### Installing Dependencies
-
-```bash
-make install
-```
-
-#### Running Tests
-
-```bash
-make test
-```
-
-#### Running Checks (linting, formatting, etc)
-
-```bash
-make check
-```
-
-#### Running Formatter
-
-```bash
-make format
-```
+- `h` - past hour
+- `d` - past 24 hours/day
+- `w` - past week
+- `m` - past month
+- `y` - past year
 
 #### Running Example
 
 This template includes an [example](https://github.com/griptape-ai/tool-template/blob/main/examples/tools/example_agent.py) demonstrating how to use the extension. It shows how to import the `ReverseStringTool`, provide it to an Agent, and run it.
 
-1. Set the required environment variables. The example needs the `OPENAI_API_KEY` environment variable to be set.
+1. Set the required environment variables. The example needs the `OPENAI_API_KEY` and `SERPER_API_KEY` environment variable to be set.
 2. Run the example:
 
 ```bash
@@ -102,42 +50,92 @@ poetry run python examples/tools/example_agent.py
 ```
 
 If successful, you should see:
+
 ```
-[11/18/24 14:55:14] INFO     ToolkitTask 6bb7fa5581d147b2a39e801631c98005
-                             Input: Use the ReverseStringTool to reverse 'Griptape'
-[11/18/24 14:55:15] INFO     Subtask c3036471831144529b8d5300c6849203
+[01/17/25 15:46:00] INFO     ToolkitTask 5def898884834cc9a49150d475275db3
+                             Input: Recent news on Trump please
+[01/17/25 15:46:01] INFO     Subtask ce7f72d30ba9423ca2e7997f339b5010
                              Actions: [
                                {
-                                 "tag": "call_VE4tGBFL7iB7VDbkKaIFIkwY",
-                                 "name": "ReverseStringTool",
-                                 "path": "reverse_string",
+                                 "tag": "call_tFCr2OMPuwnCm0wfwChjQ1rn",
+                                 "name": "WebSearchTool",
+                                 "path": "search",
                                  "input": {
                                    "values": {
-                                     "input": "Griptape"
+                                     "query": "recent news on Trump"
                                    }
                                  }
                                }
                              ]
-                    INFO     Subtask c3036471831144529b8d5300c6849203
-                             Response: epatpirG
-[11/18/24 14:55:16] INFO     ToolkitTask 6bb7fa5581d147b2a39e801631c98005
-                             Output: The reversed string of "Griptape" is "epatpirG".
+[01/17/25 15:46:02] INFO     Subtask ce7f72d30ba9423ca2e7997f339b5010
+                             Response: {"url":
+                             "https://www.washingtonpost.com/politics/2025/01/16/biden-last-minute-moves-h
+                             ard-for-trump-undo/", "title": "Biden seeks last-minute moves that could be
+                             hard for Trump to undo", "description": "From clemency to conservation, the
+                             outgoing president pushes to cement his legacy ahead of a successor
+                             determined to erase it.", "date": "8 hours ago", "source": "The Washington
+                             Post"}
+
+                             {"url": "https://www.nytimes.com/live/2025/01/16/us/trump-news-hearings",
+                             "title": "Trump Transition Live Updates: The Latest on Senate Confirmation
+                             Hearings", "description": "More Senate confirmation hearings for prospective
+                             members of the Trump cabinet wrapped up on Thursday. Scott Bessent,
+                             President-elect Donald J. Trump's pick...", "date": "3 hours ago", "source":
+                             "The New York Times"}
+
+                             {"url": "https://www.bbc.com/news/articles/cn07dv4mrg2o", "title": "Who is JD
+                             Vance, a 'never Trump guy' who will be vice-president?", "description": "The
+                             conservative from Ohio shot to fame writing about his hard upbringing and
+                             morphed from a harsh critic of Donald Trump into a Maga champion.", "date":
+                             "12 hours ago", "source": "BBC"}
+
+                             {"url":
+                             "https://www.poynter.org/commentary/2025/another-tech-big-boss-headed-to-dona
+                             ld-trumps-inauguration-elon-musk-jeff-bezos-mark-zuckerberg/", "title":
+                             "Opinion | Google CEO is the latest tech boss headed to Donald Trump\u2019s
+                             inauguration", "description": "Sundar Pichai joins CEOs from X, Meta, Amazon
+                             and TikTok for prime spot at ceremony.", "date": "1 hour ago", "source":
+                             "Poynter"}
+
+                             {"url":
+                             "https://www.yahoo.com/news/tiktok-ban-latest-app-reveals-173823265.html",
+                             "title": "TikTok ban live: Shutdown in doubt as Biden suggests Trump could
+                             save app", "description": "Supreme Court is set to release at least one
+                             opinion on Friday morning.", "date": "4 hours ago", "source": "Yahoo"}
+
+                             {"url": "https://www.voanews.com/z/4720", "title": "2024 US Election",
+                             "description": "News, analysis and context about the 2024 U.S. elections.",
+                             "date": "4 hours ago", "source": "VOA - Voice of America English News"}
+
+                             {"url":
+                             "https://www.cbsnews.com/video/main-takeaways-from-trump-nominees-latest-sena
+                             te-confirmation-hearings/", "title": "The main takeaways from Trump nominees'
+                             latest Senate confirmation hearings", "description": "On Thursday, Senators
+                             heard from President-elect Donald Trump's picks for secretary of the
+                             Interior, secretary of the Treasury, Environmental Protection...", "date":
+                             "16 hours ago", "source": "CBS News"}
+
+                             {"url": "https://www.cnn.com/2025/01/16/politics/cnn-poll-trump/index.html",
+                             "title": "CNN Poll: Trump will enter the White House with more positive
+                             sentiment than his last term", "description": "Donald Trump continues to see
+                             some of the most positive ratings of his political career, according to a new
+                             CNN poll conducted by SSRS, which finds the...", "date": "23 hours ago",
+                             "source": "CNN"}
+
+                             {"url":
+                             "https://www.hindustantimes.com/world-news/donald-trump-inauguration-january-
+                             20-coldest-washington-dc-weather-temperature-snow-101737096315890.html",
+                             "title": "'Will be very cold': Donald Trump's inauguration on January 20 to
+                             be coldest US president swearing-in of recent history", "description": "With
+                             temperatures forecast to plummet well below average for Jan, the Jan 20
+                             ceremony is set to take place amid bitterly cold, with a chance of snow on
+                             Jan...", "date": "7 hours ago", "source": "Hindustan Times"}
+
+                             {"url":
+                             "https://www.israelhayom.com/2025/01/17/trump-slams-biden-for-not-doing-anyth
+                             ing-on-hostages/", "title": "Trump slams Biden for 'not doing anything' on
+                             hostages", "description": "Former President Donald Trump discussed the
+                             Israel-Hamas hostage negotiations and asserted his influence over recent
+                             developments in an interview with The...", "date": "7 hours ago", "source":
+                             "www.israelhayom.com"}
 ```
-
-## Installing in Other Projects
-
-Extensions are designed to be shared. Extensions are made to easily install into existing Python projects.
-
-The easiest way to include your extension into an existing project is to install directly from the repository, like so:
-```bash
-poetry add git+https://github.com/{your-org}/{your-extension-name}.git
-```
-
-To install a local copy of the extension for development, run:
-```bash
-poetry add -e /path/to/your/extension
-```
-
-Any changes made to the extension will be automatically reflected in the project without needing to reinstall it.
-
-Advanced customers may seek to publish their extensions to PyPi. Those instructions are beyond the scope of this README.
