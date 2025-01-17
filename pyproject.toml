@@ -11,6 +11,8 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.9"
 griptape = "^1.0.0"
+anyio = ">=3.0.0"
+httpx = ">=0.24.0"
 
 [tool.poetry.group.test]
 optional = true
